@@ -1,0 +1,56 @@
+ db.inventory.find()
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba1"), "item" : "canvas", "qty" : 100, "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba2"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba3"), "item" : "mat", "qty" : 85, "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba4"), "item" : "mousepad", "qty" : 25, "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" }, "status" : "P" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba5"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "P" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba6"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba7"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba8"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dba9"), "item" : "sketchbook", "qty" : 80, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("60bf356c96059cae4ae7dbaa"), "item" : "sketch pad", "qty" : 95, "size" : { "h" : 22.85, "w" : 30.5, "uom" : "cm" }, "status" : "A" }
+> 
+
+
+// _id만 빼고 전체출력
+db.inventory.find({},{_id:0})
+
+// status가 D인 document 출력
+
+> db.inventory.find({'status':'D'})
+
+// qty가 높은 순부터 (내림차순)
+
+> db.inventory.find().sort({qty:-1})
+
+// qty가 80 미만인 document를 낮은 순부터 (오름차순)
+
+> db.inventory.find({qty:{$lt:80}}).sort({qty:1})
+
+// qty가 75보다 크거나 같고, 100보다 작은 document
+
+> db.inventory.find({$and:[{qty:{$gte:75}},{qty:{$lt:100}}]})
+
+// uom이 in인 document
+
+> db.inventory.find({'size.uom':{$eq:'in'}})
+
+// item이 p로 시작하는 document
+
+> db.inventory.find({"item": {$regex: /^p/}})
+
+// item이 r로 끝나는 document
+
+> db.inventory.find({item: {$regex: /r$/} })
+
+// item에 r이 들어간 document
+
+> db.inventory.find({item:/r/})
+
+// qty의 값이 25나 45인 document
+
+> db.inventory.find( { $or: [ { qty: { $eq: 25 } },  { qty: { $eq: 45 } } ] } )
+
+// w의 값이 11이 아니거나 21이 아닌 document
+
+> db.inventory.find({$and : [ {'size.w':{$ne: 11}},{'size.w':{$ne:21}}   ]})
