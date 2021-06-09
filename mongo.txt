@@ -1,0 +1,232 @@
+function test(){
+  print('test')
+}
+
+test()
+
+function test02(n){
+  return n + 10;
+}
+
+test02(10);
+
+
+var today = new Date();
+today
+
+
+
+show dbs
+db
+
+db.jstest.insertOne({name:'test', age:100, class:'qclass'})
+db.jstest.insertOne({name:'qclass', song:'미술관에서'})
+
+var cursor = db.jstest.find();
+cursor
+
+db.qclass.insertOne(
+  {name:'hong', 
+   class:'qclass', 
+   midterm:
+     {kor:100, 
+      eng:60, 
+      math:80}
+     }
+)
+
+db.qclass.insertMany(
+[
+  {name:'lee', class:'qclass', kor:100, eng:78, math:56},
+  {name:'kim', class:'qclass', kor:48, eng: 66, math:100},
+  {name:'최태준', class:'qclass', kor:100, eng:100, math:100}
+]
+)
+
+db.qclass.find()
+
+
+db.qclass.find({},{_id:0})
+db.qclass.find({},{_id:0, name:1})
+
+db.qclass.find({},{midterm:1, _id:0})
+
+db.qclass.find({class:'qclass'})
+
+db.qclass.find({midterm:{$exists:true}})
+
+db.qclass.find({kor:{$lt:50}})
+
+# 1. 국어점수가 100점인 document들만 출력
+db.qclass.find({kor:100})
+db.qclass.find({kor:{$eq:100}})
+
+# 2. 영어점수가 60점보다 크거나 같고, 70점보다 작은 document들만 출력
+db.qclass.find({eng:{$gte:60}, {eng:{$lt:70}}})
+db.qclass.find({$and:[{eng:{$gte:60}}, {eng:{$lt:70}}]})
+
+# 3. 이름에 k가 들어가는 document들만 출력
+db.qclass.find({name:/k/})
+db.qclass.find({name:{$regex:"k"}})
+
+# 4. midterm의 kor 필드가 50보다 큰 document들만 출력
+db.qclass.find({'midterm.kor':{$gt:50}})
+
+# select * from qclass where kor < 100 and math <=60
+db.qclass.find({$and:[{kor:{$lt: 100}}, {math:{$lte:60}}]})
+
+# insert into qclass(name, kor, eng, math)
+# values('shin', 90, 100, 75)
+db.qclass.insertOne({name:'shin', kor:90, eng:100, math:75})
+
+# 1: asc / -1: desc
+db.qclass.find().sort({name: 1})
+db.qclass.find().sort({kor: -1})
+
+# 최소값
+db.qclass.find({math:{$exists:true}},{_id:0}).sort({math:1}).limit(1)
+
+# 최대값
+db.qclass.find({},{_id:0}).sort({math:-1}).limit(1)
+
+db.qclass.find({},{_id:0}).skip(1)
+db.qclass.find({},{_id:0}).skip(2)
+
+db.qclass.find()
+
+db.qclass.updateOne({name:'최태준'}, {$set:{name:'choi'}})
+
+db.qclass.find()
+
+db.qclass.updateMany({kor:100},{$set:{class:'graduated'}})
+
+db.qclass.updateOne({class:'graduated'}, {$set:{class:'qclass'}})
+
+db.qclass.replaceOne(
+    {midterm:{$exists:true}}, 
+    {name:'홍길동', kor:60, eng:70, math:100}
+)
+
+{ "name" : "hong", "class" : "qclass", 
+"midterm" : { "kor" : 100, "eng" : 60, "math" : 80 } }
+
+db.qclass.deleteOne({name:'홍길동'})
+
+db.qclass.deleteOne({kor:{$gte:0}})
+db.qclass.deleteMany({kor:{$gte:0}})
+
+db.qclass.insertMany(
+[
+    {name: 'hong', kor: 100, eng: 50, math:66},
+    {name: 'lee', kor: 15, eng: 60, math:100},
+    {name: 'kim', kor: 55, eng: 30, math:44},
+    {name: 'kang', kor: 58, eng: 45, math:90},
+    {name: 'shin', kor: 100, eng: 67, math:94},
+    {name: 'you', kor: 80, eng:99, math: 41}
+]
+)
+
+db.qclass.aggregate(
+  {$match:{kor:{$gt:60}}},
+  {$project:{kor:1}},
+  {$group:{_id:'test', 'avarage':{$avg:'$kor'}}}
+)
+
+db.qclass.aggregate(
+  {$match:{name:/k/}},
+  {$group:{_id:'test2', 'sum':{$sum:'$kor'}}}
+)
+
+
+db.score.insertMany([
+  {name:"홍길동",kor:90,eng:80,mat:98,test:"midterm"},
+  {name:"이순신",kor:100,eng:100,mat:76,test:"final"},
+  {name:"김선달",kor:80,eng:55,mat:67,test :"midterm"},
+  {name:"강호동",kor:70,eng:69,mat:89,test:"midterm"},
+  {name:"유재석",kor:60,eng:80,mat:78,test:"final"},
+  {name:"신동엽",kor:100,eng:69,mat:89,test:"midterm"},
+  {name:"조세호",kor:75,eng:100,mat:100,test:"final"}
+])
+
+
+db.score.aggregate()
+
+# name, test만 출력
+db.score.aggregate({$project:{'_id': 0, 'name': 1, 'test': 1}})
+
+# test가 final인 document들의 이름, 수학, 영어를 출력
+db.score.aggregate(
+  {$match:{test:'final'}},
+  {$project:{name:1, mat:1, eng:1}}
+)
+db.score.aggregate(
+  {$project:{name:1, mat:1, eng:1}},
+  {$match:{test:'final'}}
+)
+
+# test가 midterm인 document들의 영어 평균을 출력하는데,
+# _id는 engtest, 평균은 average 라는 field로 출력하자.
+db.score.aggregate(
+  {$match: {'test': 'midterm'}},
+  {$project: {_id:0, eng:1}},
+  {$group: {'_id':'engtest', 'average': {$avg:'$eng'}}}
+)
+
+function updateKor(){
+  var tmp = db.score.updateOne({kor:{$lte:70}}, {$set:{kor:50}})
+  return tmp
+}
+
+db.score.find({},{_id:0, name:1, kor:1})
+updateKor()
+db.score.find({},{_id:0, name:1, kor:1})
+
+# test가 final인 document들의 이름, 국어,영어, '국어+영어'
+---------------------
+
+
+
+
+
+
+
+function myMap(){
+  emit(this.score, {name:this.name, kor:this.kor, eng:this.eng, test:this.test})
+}
+
+function myReduce(key, values){
+  var result={name:new Array(), kor:new Array(), eng:new Array(), total:new Array()}  //방을 만들어놓음. (name이라는 방, kor이라는 방...)
+  values.forEach(function(val){  //반복해서 꺼내올건데, 꺼내온 값을 val에 담아서,(val = document하나,)
+    if(val.test=='final'){   //만일 val이 가지고 있는 test값이 final이라면,
+      result.total += (val.kor + val.eng) + " ";  //result.totla 에 더한다.
+      result.name += val.name + " ";   // name을 name:new Array()에 추가.
+      result.kor += val.kor + " ";  // eng을 eng:new Array()에 추가...
+      result.eng += val.eng + " ";  ///final이 아닐 때까지 반복 
+    }
+  })
+  return result;
+}
+
+db.score.mapReduce(myMap, myReduce, {out:{replace:'myRes'}});
+
+db.myRes.find()
+
+
+find().pretty()
+
+db.myfriends.insertOne({name:'아이언맨', buddy:['토르', '헐크', '호크아이']})
+db.myfriends.insertOne({name:'슈퍼맨', buddy:['배트맨', '원더우먼', '아쿠아맨', '조커']})
+
+# 아이언맨의 친구에 캡틴아메리카, 블랙위도우 추가하자
+db.myfriends.updateOne(
+  {name:'아이언맨'}, 
+  {$push: {buddy:{$each:['캡틴아메리카','블랙위도우']}}}
+)
+
+# 슈퍼맨의 친구 조커를 빼자
+db.myfriends.updateOne({name:'슈퍼맨'}, {$pop:{buddy:1}})
+
+
+
+
+
